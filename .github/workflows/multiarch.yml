@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - master
-  schedule:
-    - cron: '20 4 * * *'
 
 jobs:
   build:
@@ -13,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_TAG: ${{ secrets.DOCKERHUB_OWNER }}/telegram-bot-api
-      ALPINE_VERSION: '3.21'
+      ALPINE_VERSION: "3.21"
     strategy:
       matrix:
         arch:
@@ -39,7 +37,7 @@ jobs:
         run: |
           # Get latest commit short hash
           HASH_VERSION=$(git rev-parse --short HEAD)
-          
+
           # Get real version from the code
           VERSION=$(cat telegram-bot-api/CMakeLists.txt | grep TelegramBotApi | cut -d " " -f3)
 
@@ -63,7 +61,7 @@ jobs:
 
       - name: Upload environment info as artifact
         uses: actions/upload-artifact@v4
-        if: matrix.arch == 'linux/amd64'  # Run this step only once per all matrix builds
+        if: matrix.arch == 'linux/amd64' # Run this step only once per all matrix builds
         with:
           name: github_env
           path: github.env
@@ -96,13 +94,13 @@ jobs:
           AVAILABLE_CPUS=$(nproc)
           OPTIMAL_NPROC=$(( AVAILABLE_CPUS * 3 / 4 ))
           OPTIMAL_NPROC=$(( OPTIMAL_NPROC > 1 ? OPTIMAL_NPROC : 2 ))
-          
+
           # ARM architectures might need special handling
           if [[ "${{ matrix.arch }}" == *"arm"* ]]; then
             # For ARM, be more conservative with resources
             OPTIMAL_NPROC=$(( OPTIMAL_NPROC > 2 ? 2 : OPTIMAL_NPROC ))
           fi
-          
+
           echo "nproc=${OPTIMAL_NPROC}" >> $GITHUB_OUTPUT
 
       - name: Build image
