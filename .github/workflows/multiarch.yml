@@ -17,10 +17,7 @@ jobs:
         arch:
           - linux/386
           - linux/amd64
-          - linux/arm/v6
-          - linux/arm/v7
           - linux/arm64
-          - linux/ppc64le
 
     steps:
       - name: Checkout current repo
@@ -155,10 +152,7 @@ jobs:
           cat github_env/github.env > $GITHUB_ENV
           docker load --input image_linux386/linux386.tar
           docker load --input image_linuxamd64/linuxamd64.tar
-          docker load --input image_linuxarmv6/linuxarmv6.tar
-          docker load --input image_linuxarmv7/linuxarmv7.tar
           docker load --input image_linuxarm64/linuxarm64.tar
-          docker load --input image_linuxppc64le/linuxppc64le.tar
 
       - name: Login to ghcr registry
         uses: docker/login-action@v3
@@ -178,17 +172,11 @@ jobs:
           docker manifest create ${{ env.IMAGE_TAG }}:${{ env.VERSION }} \
             --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linux386 \
             --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxamd64 \
-            --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarmv6 \
-            --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarmv7 \
-            --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarm64 \
-            --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxppc64le
+            --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarm64
           docker manifest push ${{ env.IMAGE_TAG }}:${{ env.VERSION }}
 
           docker manifest create ${{ env.IMAGE_TAG }}:latest \
             --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linux386 \
             --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxamd64 \
-            --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarmv6 \
-            --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarmv7 \
-            --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarm64 \
-            --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxppc64le
+            --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarm64
           docker manifest push ${{ env.IMAGE_TAG }}:latest
