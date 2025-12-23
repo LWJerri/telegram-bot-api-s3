@@ -11,7 +11,7 @@ If you've got any questions about bots or would like to report an issue with you
 Before start, you will need to obtain `api-id` and `api-hash` as described in <https://core.telegram.org/api/obtaining_api_id> and specify them using the `TELEGRAM_API_ID` and `TELEGRAM_API_HASH` environment variables.
 
 And then to start the Telegram Bot API all you need to do is
-`docker run -d -p 8081:8081 --name=telegram-bot-api --restart=always -v telegram-bot-api-data:/var/lib/telegram-bot-api -e TELEGRAM_API_ID=<api_id> -e TELEGRAM_API_HASH=<api-hash> aiogram/telegram-bot-api:latest`
+`docker run -d -p 8081:8081 --name=telegram-bot-api --restart=always -v telegram-bot-api-data:/var/lib/telegram-bot-api -e TELEGRAM_API_ID=<api_id> -e TELEGRAM_API_HASH=<api-hash> lwjerri/telegram-bot-api-s3:latest`
 
 ## Configuration
 
@@ -122,7 +122,7 @@ version: "3.7"
 
 services:
   telegram-bot-api:
-    image: aiogram/telegram-bot-api:latest
+    image: lwjerri/telegram-bot-api-s3:latest
     environment:
       TELEGRAM_API_ID: "<api-id>"
       TELEGRAM_API_HASH: "<api-hash>"
@@ -142,7 +142,7 @@ version: "3.7"
 
 services:
   telegram-bot-api:
-    image: aiogram/telegram-bot-api:latest
+    image: lwjerri/telegram-bot-api-s3:latest
     environment:
       TELEGRAM_API_ID: "${TELEGRAM_API_ID}"
       TELEGRAM_API_HASH: "${TELEGRAM_API_HASH}"

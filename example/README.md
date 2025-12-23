@@ -10,7 +10,7 @@ so that's meant you will need to expose files somehow differently, for example b
 
 Uses docker-compose configuration with running 2 containers:
 
-- [aiogram/telegram-bot-api](https://hub.docker.com/r/aiogram/telegram-bot-api)
+- [lwjerri/telegram-bot-api-s3](https://hub.docker.com/r/lwjerri/telegram-bot-api-s3)
 - [nginx](https://hub.docker.com/_/nginx)
 
 This example uses local Docker volume for persistent storage.

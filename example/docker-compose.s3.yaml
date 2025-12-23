@@ -1,6 +1,6 @@
 services:
   api:
-    image: aiogram/telegram-bot-api:latest
+    image: lwjerri/telegram-bot-api-s3:latest
     restart: unless-stopped
     environment:
       TELEGRAM_API_ID: "${TELEGRAM_API_ID}"
