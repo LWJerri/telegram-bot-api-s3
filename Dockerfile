@@ -4,7 +4,31 @@ FROM alpine:${ALPINE_VERSION} AS build
 ENV CXXFLAGS=""
 WORKDIR /usr/src/telegram-bot-api
 
-RUN apk add --no-cache --update alpine-sdk linux-headers git zlib-dev openssl-dev gperf cmake
+RUN apk add --no-cache --update \
+    alpine-sdk \
+    linux-headers \
+    git \
+    zlib-dev \
+    openssl-dev \
+    gperf \
+    cmake \
+    curl-dev \
+    aws-sdk-cpp-dev \
+    aws-sdk-cpp-s3 \
+    aws-crt-cpp-dev \
+    aws-c-common-dev \
+    aws-c-cal-dev \
+    aws-c-io-dev \
+    aws-c-compression-dev \
+    aws-c-http-dev \
+    aws-c-auth-dev \
+    aws-c-mqtt-dev \
+    aws-c-s3-dev \
+    aws-c-sdkutils-dev \
+    aws-c-event-stream-dev \
+    aws-checksums-dev \
+    s2n-tls-dev
+
 COPY telegram-bot-api /usr/src/telegram-bot-api
 ARG nproc=1
 RUN mkdir -p build \
@@ -18,7 +42,14 @@ FROM alpine:${ALPINE_VERSION}
 ENV TELEGRAM_WORK_DIR="/var/lib/telegram-bot-api" \
     TELEGRAM_TEMP_DIR="/tmp/telegram-bot-api"
 
-RUN apk add --no-cache --update openssl libstdc++
+RUN apk add --no-cache --update \
+    openssl \
+    libstdc++ \
+    libcurl \
+    aws-sdk-cpp-s3 \
+    aws-crt-cpp \
+    ca-certificates
+
 COPY --from=build /usr/src/telegram-bot-api/bin/telegram-bot-api /usr/local/bin/telegram-bot-api
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN addgroup -g 101 -S telegram-bot-api \

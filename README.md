@@ -1,6 +1,6 @@
 # Unofficial Docker image of Telegram Bot API
 
-Here is Docker image for https://github.com/tdlib/telegram-bot-api
+Here is Docker image for <https://github.com/tdlib/telegram-bot-api>
 
 The Telegram Bot API provides an HTTP API for creating [Telegram Bots](https://core.telegram.org/bots).
 
@@ -8,7 +8,7 @@ If you've got any questions about bots or would like to report an issue with you
 
 ## Quick reference
 
-Before start, you will need to obtain `api-id` and `api-hash` as described in https://core.telegram.org/api/obtaining_api_id and specify them using the `TELEGRAM_API_ID` and `TELEGRAM_API_HASH` environment variables.
+Before start, you will need to obtain `api-id` and `api-hash` as described in <https://core.telegram.org/api/obtaining_api_id> and specify them using the `TELEGRAM_API_ID` and `TELEGRAM_API_HASH` environment variables.
 
 And then to start the Telegram Bot API all you need to do is
 `docker run -d -p 8081:8081 --name=telegram-bot-api --restart=always -v telegram-bot-api-data:/var/lib/telegram-bot-api -e TELEGRAM_API_ID=<api_id> -e TELEGRAM_API_HASH=<api-hash> aiogram/telegram-bot-api:latest`
@@ -19,7 +19,7 @@ Container can be configured via environment variables
 
 ### `TELEGRAM_API_ID`, `TELEGRAM_API_HASH`
 
-Application identifiers for Telegram API access, which can be obtained at https://my.telegram.org as described in https://core.telegram.org/api/obtaining_api_id
+Application identifiers for Telegram API access, which can be obtained at <https://my.telegram.org> as described in <https://core.telegram.org/api/obtaining_api_id>
 
 ### `TELEGRAM_STAT`
 
@@ -49,7 +49,7 @@ maximum number of open file descriptors
 
 ### `TELEGRAM_PROXY`
 
-HTTP proxy server for outgoing webhook requests in the format http://host:port
+HTTP proxy server for outgoing webhook requests in the format <http://host:port>
 
 ### `TELEGRAM_LOCAL`
 
@@ -65,18 +65,60 @@ Set which port the api server should listen to if you want to run the image in n
 
 If not set then the api server will listen to port 8081.
 
+## S3 Storage Configuration
+
+The container supports uploading downloaded files directly to S3-compatible storage. When enabled, files requested via `getFile` API will be uploaded to S3 and the response will contain a presigned S3 URL instead of a local file path.
+
+This is useful for:
+
+- Offloading file storage to cloud storage
+- Accessing files directly from S3 without going through the Bot API server
+- Scalable and distributed file storage
+
+### How it works
+
+1. When you call `getFile`, the file is downloaded from Telegram servers to a temporary buffer
+2. The file is immediately uploaded to your S3 bucket
+3. The temporary file is automatically deleted
+4. A presigned URL is generated and returned in the `file_path` field
+5. You can use this presigned URL to download the file directly from S3
+
+### S3 File Organization
+
+Files are organized in S3 by this path: `<bucket>/<path_prefix>/<bot_token_id>/<type>/<file>`
+
+### Required S3 Environment Variables
+
+| Variable               | Description                                      |
+| ---------------------- | ------------------------------------------------ |
+| `S3_BUCKET`            | S3 bucket name (setting this enables S3 storage) |
+| `S3_ACCESS_KEY_ID`     | Access key ID for S3 authentication              |
+| `S3_SECRET_ACCESS_KEY` | Secret access key for S3 authentication          |
+
+### Optional S3 Environment Variables
+
+| Variable                  | Default     | Description                                                                 |
+| ------------------------- | ----------- | --------------------------------------------------------------------------- |
+| `S3_REGION`               | `us-east-1` | AWS region or region for S3-compatible provider                             |
+| `S3_ENDPOINT`             | _(none)_    | Custom endpoint URL for S3-compatible providers (e.g., `http://minio:9000`) |
+| `S3_PATH_PREFIX`          | _(none)_    | Subdirectory within the bucket to use (e.g., `telegram-bot-api`)            |
+| `S3_USE_PATH_STYLE`       | _(none)_    | Set to any value to use path-style URLs (required for MinIO)                |
+| `S3_PRESIGNED_URL_EXPIRY` | `3600`      | Presigned URL expiry time in seconds (default: 1 hour)                      |
+
 ## Start with persistent storage
 
 Server working directory is `/var/lib/telegram-bot-api` so if you want to persist the server data you can mount this folder as volume:
 
-`-v telegram-bot-api-data:/etc/telegram/bot/api`
+`-v telegram-bot-api-data:/var/lib/telegram-bot-api`
 
 Note that all files in this directory will be owned by user `telegram-bot-api` and group `telegram-bot-api` (uid: `101`, gid: `101`, compatible with [nginx](https://hub.docker.com/_/nginx) image)
 
 ## Usage via docker stack deploy or docker-compose
 
+### Basic Example (Local Storage)
+
 ```yaml
-version: '3.7'
+version: "3.7"
 
 services:
   telegram-bot-api:
@@ -91,4 +133,27 @@ services:
 
 volumes:
   telegram-bot-api-data:
+```
+
+### S3 Storage Example (AWS)
+
+```yaml
+version: "3.7"
+
+services:
+  telegram-bot-api:
+    image: aiogram/telegram-bot-api:latest
+    environment:
+      TELEGRAM_API_ID: "${TELEGRAM_API_ID}"
+      TELEGRAM_API_HASH: "${TELEGRAM_API_HASH}"
+
+      S3_BUCKET: "${S3_BUCKET}"
+      S3_ACCESS_KEY_ID: "${S3_ACCESS_KEY_ID}"
+      S3_SECRET_ACCESS_KEY: "${S3_SECRET_ACCESS_KEY}"
+      S3_REGION: "${S3_REGION:-us-east-1}"
+    tmpfs:
+      - /var/lib/telegram-bot-api:size=2G,uid=101,gid=101
+      - /tmp/telegram-bot-api:size=1G,uid=101,gid=101
+    ports:
+      - "8081:8081"
 ```
