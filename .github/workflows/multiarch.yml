@@ -8,16 +8,19 @@ on:
 jobs:
   build:
     name: Build Docker image (${{ matrix.arch }})
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     env:
-      IMAGE_TAG: ${{ secrets.DOCKERHUB_OWNER }}/telegram-bot-api
+      IMAGE_TAG: ${{ secrets.DOCKERHUB_OWNER }}/telegram-bot-api-s3
       ALPINE_VERSION: "3.21"
     strategy:
       matrix:
-        arch:
-          - linux/386
-          - linux/amd64
-          - linux/arm64
+        include:
+          - arch: linux/386
+            runner: ubuntu-latest
+          - arch: linux/amd64
+            runner: ubuntu-latest
+          - arch: linux/arm64
+            runner: ubuntu-24.04-arm
 
     steps:
       - name: Checkout current repo
@@ -26,7 +29,7 @@ jobs:
       - name: Checkout upstream repo
         uses: actions/checkout@v4
         with:
-          repository: tdlib/telegram-bot-api
+          repository: LWJerri/telegram-bot-api
           path: telegram-bot-api
           submodules: recursive
 
@@ -63,9 +66,6 @@ jobs:
           name: github_env
           path: github.env
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -91,12 +91,6 @@ jobs:
           AVAILABLE_CPUS=$(nproc)
           OPTIMAL_NPROC=$(( AVAILABLE_CPUS * 3 / 4 ))
           OPTIMAL_NPROC=$(( OPTIMAL_NPROC > 1 ? OPTIMAL_NPROC : 2 ))
-
-          # ARM architectures might need special handling
-          if [[ "${{ matrix.arch }}" == *"arm"* ]]; then
-            # For ARM, be more conservative with resources
-            OPTIMAL_NPROC=$(( OPTIMAL_NPROC > 2 ? 2 : OPTIMAL_NPROC ))
-          fi
 
           echo "nproc=${OPTIMAL_NPROC}" >> $GITHUB_OUTPUT
 
