@@ -77,11 +77,13 @@ This is useful for:
 
 ### How it works
 
-1. When you call `getFile`, the file is downloaded from Telegram servers to a temporary buffer
-2. The file is immediately uploaded to your S3 bucket
-3. The temporary file is automatically deleted
-4. A presigned URL is generated and returned in the `file_path` field
-5. You can use this presigned URL to download the file directly from S3
+1. When you call `getFile`, the file is downloaded from Telegram servers to a temporary buffer.
+2. The file is immediately uploaded to your S3 bucket.
+3. The temporary file is automatically deleted.
+4. A URL is generated and returned in the `file_path` field:
+   - By default, a presigned URL with authentication signature is returned.
+   - If `S3_USE_PUBLIC_URLS` is set, a simple public URL without signing is returned (useful for public buckets).
+5. You can use this URL to download the file directly from S3.
 
 ### S3 File Organization
 
@@ -103,6 +105,7 @@ Files are organized in S3 by this path: `<bucket>/<path_prefix>/<bot_token_id>/<
 | `S3_ENDPOINT`             | _(none)_    | Custom endpoint URL for S3-compatible providers (e.g., `http://minio:9000`) |
 | `S3_PATH_PREFIX`          | _(none)_    | Subdirectory within the bucket to use (e.g., `telegram-bot-api`)            |
 | `S3_USE_PATH_STYLE`       | _(none)_    | Set to any value to use path-style URLs (required for MinIO)                |
+| `S3_USE_PUBLIC_URLS`      | _(none)_    | Set to any value to use public URLs instead of presigned URLs               |
 | `S3_PRESIGNED_URL_EXPIRY` | `3600`      | Presigned URL expiry time in seconds (default: 1 hour)                      |
 
 ## Start with persistent storage
