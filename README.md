@@ -83,7 +83,8 @@ This is useful for:
 4. A URL is generated and returned in the `file_path` field:
    - By default, a presigned URL with authentication signature is returned.
    - If `S3_USE_PUBLIC_URLS` is set, a simple public URL without signing is returned (useful for public buckets).
-5. You can use this URL to download the file directly from S3.
+   - If `S3_USE_PATH_ONLY` is set, only the S3 path is returned and `S3_USE_PUBLIC_URLS` will be ignored.
+5. You can use this URL/path to download the file directly from S3.
 
 ### S3 File Organization
 
@@ -106,6 +107,7 @@ Files are organized in S3 by this path: `<bucket>/<path_prefix>/<bot_token_id>/<
 | `S3_PATH_PREFIX`          | _(none)_    | Subdirectory within the bucket to use (e.g., `telegram-bot-api`)            |
 | `S3_USE_PATH_STYLE`       | _(none)_    | Set to any value to use path-style URLs (required for MinIO)                |
 | `S3_USE_PUBLIC_URLS`      | _(none)_    | Set to any value to use public URLs instead of presigned URLs               |
+| `S3_USE_PATH_ONLY`        | _(none)_    | Set to any value to return only the S3 path without the base URL            |
 | `S3_PRESIGNED_URL_EXPIRY` | `3600`      | Presigned URL expiry time in seconds (default: 1 hour)                      |
 
 ## Start with persistent storage
